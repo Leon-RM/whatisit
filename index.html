@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คิดถึงจัง💗 Popups</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .instruction {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #555;
+            text-align: center;
+        }
+        
+        .popup {
+            position: absolute;
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff6b6b;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            animation: popIn 0.3s forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="instruction">Click Anywhere</div>
+    
+    <script>
+        const body = document.body;
+        const instruction = document.querySelector('.instruction');
+        let delay = 300; // Initial delay between popups in milliseconds (much faster start)
+        let minDelay = 5; // Minimum delay (super fast - 200 popups per second at maximum)
+        let reduceRate = 15; // How much to reduce delay each time (more aggressive reduction)
+        let accelerationFactor = 1.2; // Exponential acceleration
+        let isRunning = false;
+        let timeoutId;
+        let popupCount = 0;
+        
+        // Create a popup at random position
+        function createPopup() {
+            const popup = document.createElement('div');
+            popup.classList.add('popup');
+            popup.innerText = 'คิดถึงจัง 💗';
+            
+            // Random position with padding from edges
+            const x = Math.random() * (window.innerWidth - 200);
+            const y = Math.random() * (window.innerHeight - 100);
+            
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+            
+            // Random color variation for visual interest
+            const hue = Math.floor(Math.random() * 360);
+            popup.style.color = `hsl(${hue}, 80%, 65%)`;
+            
+            body.appendChild(popup);
+            popupCount++;
+            
+            // Schedule next popup with exponentially decreasing delay
+            if (isRunning) {
+                // Make it faster exponentially
+                let reduction = reduceRate * Math.pow(accelerationFactor, Math.min(20, Math.floor(popupCount / 10)));
+                delay = Math.max(delay - reduction, minDelay);
+                
+                timeoutId = setTimeout(createPopup, delay);
+                
+                // After certain amount of popups, create multiple at once
+                if (popupCount > 30 && popupCount % 10 === 0) {
+                    // Burst mode
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => createExtraPopup(), Math.random() * 100);
+                    }
+                }
+            }
+        }
+        
+        // Extra popups for burst mode
+        function createExtraPopup() {
+            const popup = document.createElement('div');
+            popup.classList.add('popup');
+            popup.innerText = 'คิดถึงจัง💗';
+            
+            const x = Math.random() * (window.innerWidth - 200);
+            const y = Math.random() * (window.innerHeight - 100);
+            
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+            
+            const hue = Math.floor(Math.random() * 360);
+            popup.style.color = `hsl(${hue}, 80%, 65%)`;
+            
+            body.appendChild(popup);
+        }
+        
+        // Start the popup process on click
+        body.addEventListener('click', () => {
+            if (!isRunning) {
+                instruction.style.display = 'none';
+                isRunning = true;
+                createPopup();
+            } else {
+                // Additional clicks create bursts of popups
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => createExtraPopup(), Math.random() * 200);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
